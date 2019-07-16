@@ -1,10 +1,12 @@
 <template>
   <v-app>
     <v-toolbar app>
-      <v-toolbar-title class="headline text-uppercase">
-        <span>Ranked</span>
-        <span class="font-weight-light">Voting System</span>
-      </v-toolbar-title>
+      <router-link to="/" class="toolbar-title">
+        <v-toolbar-title class="headline text-uppercase">
+          <span>Ranked</span>
+          <span class="font-weight-light">Voting System</span>
+        </v-toolbar-title>
+      </router-link>
       <v-spacer></v-spacer>
       <v-tooltip bottom>
         <template v-slot:activator="{ on }">
@@ -12,24 +14,34 @@
             <v-icon>language</v-icon>
           </v-btn>
         </template>
-        <span></span>
+        <span>{{ $vuetify.t('$vuetify.changeLanguage') }}</span>
       </v-tooltip>
     </v-toolbar>
 
     <v-content>
-      <Home />
+      <v-container fluid>
+        <v-fade-transition mode="out-in">
+          <router-view></router-view>
+        </v-fade-transition>
+      </v-container>
     </v-content>
   </v-app>
 </template>
 
 <script>
-import Home from "./components/Home";
+import VueRouter from "vue-router";
+// import Home from "./components/Home";
+const Home = () => import("./components/Home");
+
+const router = new VueRouter({
+  mode: "history",
+  base: __dirname,
+  routes: [{ path: "/", component: Home }]
+});
 
 export default {
   name: "App",
-  components: {
-    Home
-  },
+  router,
   created: function() {
     this.$vuetify.lang.current = navigator.language.split("-")[0];
   },

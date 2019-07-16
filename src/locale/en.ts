@@ -15,6 +15,7 @@ export default {
     prev: 'Previous visual',
     next: 'Next visual'
   },
+  changeLanguage: 'Change language',
   home: {
     title: 'Ranked voting system',
     subtitle: 'Create democratic polls for everyone',

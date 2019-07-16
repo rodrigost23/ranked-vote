@@ -15,6 +15,7 @@ export default {
     prev: 'Visual anterior',
     next: 'Próximo visual'
   },
+  changeLanguage: 'Mudar idioma',
   home: {
     title: 'Sistema de votação ranqueado',
     subtitle: 'Eleições democráticas para todos!',
