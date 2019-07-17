@@ -1,6 +1,6 @@
 <template>
   <v-app>
-    <v-app-bar app>
+    <v-app-bar app dark color="blue" elevate-on-scroll>
       <router-link to="/" class="toolbar-title">
         <v-toolbar-title class="headline text-uppercase">
           <span>Ranked</span>
@@ -19,7 +19,10 @@
     </v-app-bar>
 
     <v-content>
-      <v-container fluid>
+      <v-container
+        fluid
+        :class="{'pa-0': $vuetify.breakpoint.xs}"
+      >
         <v-fade-transition mode="out-in">
           <router-view></router-view>
         </v-fade-transition>
@@ -56,3 +59,10 @@ export default {
   })
 };
 </script>
+<style>
+.toolbar-title {
+  color: inherit !important;
+  text-decoration: inherit;
+}
+</style>
+

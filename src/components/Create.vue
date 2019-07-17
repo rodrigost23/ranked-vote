@@ -1,6 +1,6 @@
 <template>
   <v-layout wrap>
-    <v-flex sm12 md6 offset-md3>
+    <v-flex xs12 sm10 offset-sm1 md6 offset-md3>
       <v-expand-transition>
         <v-card>
           <v-card-title primary-title>
