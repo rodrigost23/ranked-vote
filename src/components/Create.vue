@@ -27,6 +27,14 @@
               </template>
             </transition-group>
           </draggable>
+          <v-list-item>
+            <v-list-item-icon class="handle">
+              <v-icon>add</v-icon>
+            </v-list-item-icon>
+            <v-list-item-content>
+              <v-list-item-title>Add candidate</v-list-item-title>
+            </v-list-item-content>
+          </v-list-item>
         </v-list>
       </v-card>
     </v-flex>
@@ -62,20 +70,20 @@ export default {
 
 <style>
 .sortable-drag {
-   display: none;
+  display: none;
 }
 
 .handle {
-    cursor: move; /* fallback if grab cursor is unsupported */
-    cursor: grab;
-    cursor: -moz-grab;
-    cursor: -webkit-grab;
+  cursor: move; /* fallback if grab cursor is unsupported */
+  cursor: grab;
+  cursor: -moz-grab;
+  cursor: -webkit-grab;
 }
 
- /* Apply a "closed-hand" cursor during drag operation. */
+/* Apply a "closed-hand" cursor during drag operation. */
 .handle:active {
-    cursor: grabbing !important;
-    cursor: -moz-grabbing !important;
-    cursor: -webkit-grabbing !important;
+  cursor: grabbing !important;
+  cursor: -moz-grabbing !important;
+  cursor: -webkit-grabbing !important;
 }
 </style>
