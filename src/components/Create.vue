@@ -57,6 +57,7 @@ import draggable from "vuedraggable";
 export default {
   components: { draggable },
   data: () => ({
+    itemsMax: 3,
     items: [
       { id: 1, text: "Item 1" },
       { id: 2, text: "Item 2" },
@@ -76,8 +77,7 @@ export default {
   },
   methods: {
     newItem: function() {
-      var id = this.items.length + 1;
-      this.items.push({ id: id, text: "Item " + id });
+      this.items.push({ id: ++this.itemsMax, text: "Item " + this.itemsMax });
     },
     removeItem: function (id) {
       for (const i in this.items) {
