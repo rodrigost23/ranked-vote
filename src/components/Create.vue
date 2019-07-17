@@ -1,42 +1,52 @@
 <template>
   <v-layout wrap>
     <v-flex sm12 md6 offset-md3>
-      <v-card>
-        <v-card-title primary-title>
-          <h2>Teste</h2>
-        </v-card-title>
-        <v-list>
-          <v-subheader>CANDIDATES</v-subheader>
-          <draggable
-            v-model="items"
-            v-bind="dragOptions"
-            :group="{name: 'candidates'}"
-            ghost-class="elevation-1"
-            handle=".handle"
-          >
-            <transition-group type="transition" :name="!drag ? 'flip-list' : null">
-              <template v-for="item in items">
-                <v-list-item :key="item.id">
-                  <v-list-item-icon class="handle">
-                    <v-icon>mdi-drag</v-icon>
-                  </v-list-item-icon>
-                  <v-list-item-content>
-                    <v-list-item-title v-text="item.text"></v-list-item-title>
-                  </v-list-item-content>
-                </v-list-item>
-              </template>
-            </transition-group>
-          </draggable>
-          <v-list-item>
-            <v-list-item-icon class="handle">
-              <v-icon>add</v-icon>
-            </v-list-item-icon>
-            <v-list-item-content>
-              <v-list-item-title>Add candidate</v-list-item-title>
-            </v-list-item-content>
-          </v-list-item>
-        </v-list>
-      </v-card>
+      <v-expand-transition>
+        <v-card>
+          <v-card-title primary-title>
+            <h2>Teste</h2>
+          </v-card-title>
+          <v-list>
+            <v-subheader>CANDIDATES</v-subheader>
+            <draggable
+              v-model="items"
+              v-bind="dragOptions"
+              :group="{name: 'candidates'}"
+              ghost-class="elevation-1"
+              handle=".handle"
+            >
+              <transition-group type="transition" :name="!drag ? 'flip-list' : null">
+                <template v-for="item in items">
+                  <v-list-item :key="item.id">
+                    <v-list-item-avatar class="handle">
+                      <v-icon>mdi-drag</v-icon>
+                    </v-list-item-avatar>
+                    <v-list-item-content>
+                      <v-list-item-title v-text="item.text"></v-list-item-title>
+                    </v-list-item-content>
+                    <v-list-item-icon>
+                      <v-btn icon @click="removeItem(item.id)">
+                        <v-icon>mdi-minus-circle</v-icon>
+                      </v-btn>
+                    </v-list-item-icon>
+                  </v-list-item>
+                </template>
+              </transition-group>
+            </draggable>
+
+            <v-list-item-group>
+              <v-list-item @click="newItem">
+                <v-list-item-icon>
+                  <v-icon>add</v-icon>
+                </v-list-item-icon>
+                <v-list-item-content>
+                  <v-list-item-title>Add candidate</v-list-item-title>
+                </v-list-item-content>
+              </v-list-item>
+            </v-list-item-group>
+          </v-list>
+        </v-card>
+      </v-expand-transition>
     </v-flex>
   </v-layout>
 </template>
@@ -47,7 +57,6 @@ import draggable from "vuedraggable";
 export default {
   components: { draggable },
   data: () => ({
-    item: -1,
     items: [
       { id: 1, text: "Item 1" },
       { id: 2, text: "Item 2" },
@@ -63,6 +72,20 @@ export default {
         disabled: false,
         ghostClass: "ghost"
       };
+    }
+  },
+  methods: {
+    newItem: function() {
+      var id = this.items.length + 1;
+      this.items.push({ id: id, text: "Item " + id });
+    },
+    removeItem: function (id) {
+      for (const i in this.items) {
+        if (this.items.hasOwnProperty(i) && this.items[i].id == id) {
+          this.items.splice(i, 1);
+          break;
+        }
+      }
     }
   }
 };
