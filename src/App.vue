@@ -19,10 +19,7 @@
     </v-app-bar>
 
     <v-content>
-      <v-container
-        fluid
-        :class="{'pa-0': $vuetify.breakpoint.xs}"
-      >
+      <v-container fluid :class="{'pa-0': $vuetify.breakpoint.xs}">
         <v-fade-transition mode="out-in">
           <router-view></router-view>
         </v-fade-transition>
@@ -35,7 +32,7 @@
 import VueRouter from "vue-router";
 // import Home from './components/Home';
 const Home = () => import("./components/Home");
-const Create = () => import("./components/Create");
+const Edit = () => import("./components/Edit");
 const NotFound = () => import("./components/NotFound");
 
 const router = new VueRouter({
@@ -43,7 +40,8 @@ const router = new VueRouter({
   base: __dirname,
   routes: [
     { path: "/", component: Home },
-    { path: "/new", component: Create },
+    { path: "/new", component: Edit },
+    { path: "/:id", component: Edit },
     { path: "*", component: NotFound }
   ]
 });
@@ -51,12 +49,12 @@ const router = new VueRouter({
 export default {
   name: "App",
   router,
-  created: function() {
+  created() {
     this.$vuetify.lang.current = navigator.language.split("-")[0];
   },
-  data: () => ({
-    //
-  })
+  data() {
+    return {};
+  }
 };
 </script>
 <style>

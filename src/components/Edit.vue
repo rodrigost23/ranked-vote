@@ -22,7 +22,7 @@
               ghost-class="elevation-1"
               handle=".handle"
             >
-              <template v-for="item in items">
+              <template v-for="item in itemsSync">
                 <v-expand-transition :key="item.id">
                   <div style="overflow:hidden" v-show="item.show && !item.hide">
                     <v-list-item>
@@ -76,17 +76,26 @@
 
 <script>
 import draggable from "vuedraggable";
+import { db } from "../db";
 
 export default {
   components: { draggable },
-  data: () => ({
-    title: null,
-    itemsMax: 1,
-    items: [{ id: 1, text: null, show: true, hide: false }],
-    drag: false,
-    newEnabled: false,
-    saveEnabled: false
-  }),
+  data() {
+    return {
+      poll: null,
+      title: null,
+      itemsMax: 1,
+      items: [{ id: 1, text: null, show: true, hide: false }],
+      drag: false,
+      newEnabled: false,
+      saveEnabled: false
+    };
+  },
+  firestore() {
+    return {
+      poll: db.collection("polls").doc(this.$route.params.id)
+    };
+  },
   computed: {
     dragOptions() {
       return {
@@ -94,6 +103,19 @@ export default {
         group: "description",
         disabled: false
       };
+    },
+    itemsSync() {
+      if (this.poll) {
+        var result = [];
+        for (const i in this.poll.candidates) {
+          if (this.poll.candidates.hasOwnProperty(i)) {
+            const el = this.poll.candidates[i];
+            result.push({ id: i, text: el, show: true, hide: false });
+          }
+        }
+        return result;
+      }
+      return this.items;
     }
   },
   watch: {
@@ -112,7 +134,7 @@ export default {
     }
   },
   methods: {
-    newItem: function() {
+    newItem() {
       if (!this.newEnabled) return;
 
       var id = ++this.itemsMax;
@@ -122,14 +144,16 @@ export default {
         show: false,
         hide: false
       });
-      setTimeout(() => (this.items[inserted - 1].show = true), 50);
+      setTimeout(function() {
+        this.items[inserted - 1].show = true;
+      }, 50);
     },
-    removeItem: function(id) {
+    removeItem(id) {
       for (const i in this.items) {
         if (this.items.hasOwnProperty(i) && this.items[i].id == id) {
           this.items[i].hide = true;
           this.saveEnabled = false;
-          setTimeout(() => {
+          setTimeout(function() {
             this.items.splice(i, 1);
             this.saveEnabled = true;
           }, 200);
