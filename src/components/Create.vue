@@ -22,9 +22,9 @@
               ghost-class="elevation-1"
               handle=".handle"
             >
-              <transition-group type="transition" :name="!drag ? 'fliip-list' : null">
-                <template v-for="item in items">
-                  <div style="overflow:hidden" :key="item.id">
+              <template v-for="item in items">
+                <v-expand-transition :key="item.id">
+                  <div style="overflow:hidden" v-show="item.show && !item.hide">
                     <v-list-item>
                       <v-list-item-avatar class="handle">
                         <v-icon>mdi-drag</v-icon>
@@ -40,19 +40,24 @@
                         </v-list-item-title>
                       </v-list-item-content>
                       <v-list-item-icon>
-                        <v-btn icon @click="removeItem(item.id)">
-                          <v-icon>mdi-minus-circle</v-icon>
-                        </v-btn>
+                        <v-tooltip left>
+                          <template v-slot:activator="{ on }">
+                            <v-btn icon large v-on="on" @click="removeItem(item.id)">
+                              <v-icon>mdi-minus-circle</v-icon>
+                            </v-btn>
+                          </template>
+                          <span>Remove candidate</span>
+                        </v-tooltip>
                       </v-list-item-icon>
                     </v-list-item>
                   </div>
-                </template>
-              </transition-group>
+                </v-expand-transition>
+              </template>
             </draggable>
 
             <v-expand-transition>
-              <v-list-item-group v-show="newEnabled" mandatory>
-                <v-list-item @click="newItem">
+              <div style="overflow:hidden">
+                <v-list-item @click="newItem" :disabled="!newEnabled">
                   <v-list-item-avatar>
                     <v-icon>add</v-icon>
                   </v-list-item-avatar>
@@ -60,7 +65,7 @@
                     <v-list-item-title>Add candidate</v-list-item-title>
                   </v-list-item-content>
                 </v-list-item>
-              </v-list-item-group>
+              </div>
             </v-expand-transition>
           </v-list>
         </v-card>
@@ -77,17 +82,17 @@ export default {
   data: () => ({
     title: null,
     itemsMax: 1,
-    items: [{ id: 1, text: null }],
+    items: [{ id: 1, text: null, show: true, hide: false }],
     drag: false,
-    newEnabled: false
+    newEnabled: false,
+    saveEnabled: false
   }),
   computed: {
     dragOptions() {
       return {
         animation: 200,
         group: "description",
-        disabled: false,
-        ghostClass: "ghost"
+        disabled: false
       };
     }
   },
@@ -101,18 +106,33 @@ export default {
           }
         }
         this.newEnabled = true;
+        this.saveEnabled = true;
       },
       deep: true
     }
   },
   methods: {
     newItem: function() {
-      this.items.push({ id: ++this.itemsMax, text: null });
+      if (!this.newEnabled) return;
+
+      var id = ++this.itemsMax;
+      var inserted = this.items.push({
+        id: id,
+        text: null,
+        show: false,
+        hide: false
+      });
+      setTimeout(() => (this.items[inserted - 1].show = true), 50);
     },
     removeItem: function(id) {
       for (const i in this.items) {
         if (this.items.hasOwnProperty(i) && this.items[i].id == id) {
-          this.items.splice(i, 1);
+          this.items[i].hide = true;
+          this.saveEnabled = false;
+          setTimeout(() => {
+            this.items.splice(i, 1);
+            this.saveEnabled = true;
+          }, 200);
           break;
         }
       }
