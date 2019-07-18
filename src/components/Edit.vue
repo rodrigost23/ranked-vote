@@ -2,13 +2,26 @@
   <v-layout wrap>
     <v-flex xs12 sm10 offset-sm1 md6 offset-md3>
       <v-expand-transition>
-        <v-card>
-          <v-card-title primary-title :class="{'grey--text': !title}">
+        <v-card :elevation="isLoading?0:4">
+          <v-overlay :absolute="true" :value="isLoading" opacity="0.1">
+            <v-progress-circular indeterminate color="primary"></v-progress-circular>
+          </v-overlay>
+          <v-card-title primary-title :class="{'grey--text': !poll.title}">
             <h3>
-              <v-edit-dialog :return-value.sync="title" lazy>
-                {{title||"Click to set the title"}}
+              <v-edit-dialog
+                :return-value.sync="poll.title"
+                lazy
+                @open="tempName = poll.title;"
+                @cancel="poll.title = tempName || poll.title;"
+                @save="save();"
+              >
+                {{poll.title||"Click to set the title"}}
                 <template v-slot:input>
-                  <v-text-field label="Type poll name" single-line></v-text-field>
+                  <v-text-field
+                    label="Type poll name"
+                    single-line
+                    v-model="poll.title"
+                  ></v-text-field>
                 </template>
               </v-edit-dialog>
             </h3>
@@ -16,13 +29,13 @@
           <v-list flat>
             <v-subheader>CANDIDATES</v-subheader>
             <draggable
-              v-model="items"
+              :v-model="poll?poll.candidates:null"
               v-bind="dragOptions"
               :group="{name: 'candidates'}"
               ghost-class="elevation-1"
               handle=".handle"
             >
-              <template v-for="item in itemsSync">
+              <template v-for="item in poll?poll.candidates:null">
                 <v-expand-transition :key="item.id">
                   <div style="overflow:hidden" v-show="item.show && !item.hide">
                     <v-list-item>
@@ -30,11 +43,22 @@
                         <v-icon>mdi-drag</v-icon>
                       </v-list-item-avatar>
                       <v-list-item-content>
-                        <v-list-item-title :class="{'grey--text': !item.text}">
-                          <v-edit-dialog :return-value.sync="item.text" lazy style="top:-100px">
-                            {{item.text||"Click to set candidate name"}}
+                        <v-list-item-title :class="{'grey--text': !item.name}">
+                          <v-edit-dialog
+                            :return-value.sync="item.name"
+                            lazy
+                            style="top:-100px"
+                            @open="tempName = item.name;"
+                            @cancel="item.name = tempName || item.name;"
+                            @save="save();"
+                          >
+                            {{item.name||"Click to set candidate name"}}
                             <template v-slot:input>
-                              <v-text-field label="Candidate name" single-line></v-text-field>
+                              <v-text-field
+                                label="Candidate name"
+                                single-line
+                                v-model="item.name"
+                              ></v-text-field>
                             </template>
                           </v-edit-dialog>
                         </v-list-item-title>
@@ -82,13 +106,16 @@ export default {
   components: { draggable },
   data() {
     return {
-      poll: null,
-      title: null,
+      poll: {
+        title: null,
+        candidates: [{ id: 1, name: null, show: true, hide: false }]
+      },
       itemsMax: 1,
-      items: [{ id: 1, text: null, show: true, hide: false }],
+      tempName: null,
       drag: false,
       newEnabled: false,
-      saveEnabled: false
+      saveEnabled: false,
+      isLoading: false
     };
   },
   firestore() {
@@ -103,34 +130,22 @@ export default {
         group: "description",
         disabled: false
       };
-    },
-    itemsSync() {
-      if (this.poll) {
-        var result = [];
-        for (const i in this.poll.candidates) {
-          if (this.poll.candidates.hasOwnProperty(i)) {
-            const el = this.poll.candidates[i];
-            result.push({ id: i, text: el, show: true, hide: false });
-          }
-        }
-        return result;
-      }
-      return this.items;
     }
   },
   watch: {
-    items: {
+    poll: {
       handler(val) {
-        for (const i in val) {
-          if (val.hasOwnProperty(i) && !val[i].text) {
-            this.newEnabled = false;
-            return;
-          }
-        }
-        this.newEnabled = true;
-        this.saveEnabled = true;
+        this.pollChanged(val);
       },
       deep: true
+    },
+    saveEnabled() {
+      this.pollChanged(this.poll);
+    }
+  },
+  created() {
+    if (this.$route.params.id) {
+      this.isLoading = true;
     }
   },
   methods: {
@@ -138,27 +153,60 @@ export default {
       if (!this.newEnabled) return;
 
       var id = ++this.itemsMax;
-      var inserted = this.items.push({
+      var inserted = this.poll.candidates.push({
         id: id,
-        text: null,
+        name: null,
         show: false,
         hide: false
       });
+      var me = this;
       setTimeout(function() {
-        this.items[inserted - 1].show = true;
+        me.poll.candidates[inserted - 1].show = true;
       }, 50);
     },
     removeItem(id) {
-      for (const i in this.items) {
-        if (this.items.hasOwnProperty(i) && this.items[i].id == id) {
-          this.items[i].hide = true;
-          this.saveEnabled = false;
+      for (const i in this.poll.candidates) {
+        if (
+          this.poll.candidates.hasOwnProperty(i) &&
+          this.poll.candidates[i].id == id
+        ) {
+          this.poll.candidates[i].hide = true;
+          var me = this;
           setTimeout(function() {
-            this.items.splice(i, 1);
-            this.saveEnabled = true;
+            me.poll.candidates.splice(i, 1);
+            me.save();
           }, 200);
           break;
         }
+      }
+    },
+    pollChanged(val) {
+      if (val) {
+        this.itemsMax = val.candidates.reduce(
+          (max, c) => (c.id > max ? c.id : max),
+          val.candidates[0].id
+        );
+        if (this.saveEnabled) this.$firestoreRefs.poll.update(val);
+        for (const i in val.candidates) {
+          if (val.candidates.hasOwnProperty(i)) {
+            const el = val.candidates[i];
+
+            if (!el.name) {
+              this.newEnabled = false;
+            } else {
+              this.newEnabled = true;
+            }
+          }
+        }
+        this.isLoading = false;
+      }
+    },
+    save() {
+      this.$firestoreRefs.poll.update(this.poll);
+    },
+    focusEditDialog() {
+      if (this.$refs.hasOwnProperty("editDialogText")) {
+        this.$refs.editDialogText[0].focus();
       }
     }
   }
