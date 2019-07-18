@@ -17,11 +17,7 @@
               >
                 {{poll.title||"Click to set the title"}}
                 <template v-slot:input>
-                  <v-text-field
-                    label="Type poll name"
-                    single-line
-                    v-model="poll.title"
-                  ></v-text-field>
+                  <v-text-field label="Type poll name" single-line v-model="poll.title"></v-text-field>
                 </template>
               </v-edit-dialog>
             </h3>
@@ -54,11 +50,7 @@
                           >
                             {{item.name||"Click to set candidate name"}}
                             <template v-slot:input>
-                              <v-text-field
-                                label="Candidate name"
-                                single-line
-                                v-model="item.name"
-                              ></v-text-field>
+                              <v-text-field label="Candidate name" single-line v-model="item.name"></v-text-field>
                             </template>
                           </v-edit-dialog>
                         </v-list-item-title>
@@ -101,11 +93,14 @@
 <script>
 import draggable from "vuedraggable";
 import { db } from "../db";
+const Hashids = require("hashids");
 
 export default {
   components: { draggable },
   data() {
     return {
+      Hashids: null,
+      id: this.$route.params.id,
       poll: {
         title: null,
         candidates: [{ id: 1, name: null, show: true, hide: false }]
@@ -120,7 +115,7 @@ export default {
   },
   firestore() {
     return {
-      poll: db.collection("polls").doc(this.$route.params.id)
+      poll: db.collection("polls").doc(this.id)
     };
   },
   computed: {
@@ -144,8 +139,12 @@ export default {
     }
   },
   created() {
-    if (this.$route.params.id) {
+    if (this.id) {
       this.isLoading = true;
+    } else {
+      this.Hashids = new Hashids.default();
+      this.id = this.Hashids.encode(Date.now());
+      // db.collection('polls').doc(this.id).set(this.poll);
     }
   },
   methods: {
@@ -186,7 +185,7 @@ export default {
           (max, c) => (c.id > max ? c.id : max),
           val.candidates[0].id
         );
-        if (this.saveEnabled) this.$firestoreRefs.poll.update(val);
+        if (this.saveEnabled) db.collection("polls").doc(this.id).set(val);
         for (const i in val.candidates) {
           if (val.candidates.hasOwnProperty(i)) {
             const el = val.candidates[i];
@@ -202,7 +201,8 @@ export default {
       }
     },
     save() {
-      this.$firestoreRefs.poll.update(this.poll);
+      db.collection("polls").doc(this.id).set(this.poll);
+      this.$router.replace('/'+this.id)
     },
     focusEditDialog() {
       if (this.$refs.hasOwnProperty("editDialogText")) {
