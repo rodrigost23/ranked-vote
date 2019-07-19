@@ -114,9 +114,11 @@ export default {
     };
   },
   firestore() {
-    return {
-      poll: db.collection("polls").doc(this.id)
-    };
+    return this.id
+      ? {
+          poll: db.collection("polls").doc(this.id)
+        }
+      : null;
   },
   computed: {
     dragOptions() {
@@ -185,7 +187,10 @@ export default {
           (max, c) => (c.id > max ? c.id : max),
           val.candidates[0].id
         );
-        if (this.saveEnabled) db.collection("polls").doc(this.id).set(val);
+        if (this.saveEnabled)
+          db.collection("polls")
+            .doc(this.id)
+            .set(val);
         for (const i in val.candidates) {
           if (val.candidates.hasOwnProperty(i)) {
             const el = val.candidates[i];
@@ -201,8 +206,10 @@ export default {
       }
     },
     save() {
-      db.collection("polls").doc(this.id).set(this.poll);
-      this.$router.replace('/'+this.id)
+      db.collection("polls")
+        .doc(this.id)
+        .set(this.poll);
+      this.$router.replace("/" + this.id);
     },
     focusEditDialog() {
       if (this.$refs.hasOwnProperty("editDialogText")) {
