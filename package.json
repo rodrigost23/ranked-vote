@@ -15,14 +15,18 @@
   "dependencies": {
     "@nuxtjs/pwa": "^2.6.0",
     "fibers": "^4.0.1",
-    "nuxt": "^2.0.0"
+    "firebase": "^6.3.1",
+    "hashids": "^1.2.2",
+    "nuxt": "^2.8.1",
+    "nuxt-fire": "^1.4.1",
+    "vuedraggable": "^2.23.0"
   },
   "devDependencies": {
     "@nuxtjs/eslint-config": "^0.0.1",
     "@nuxtjs/eslint-module": "^0.0.1",
     "@nuxtjs/vuetify": "^1.0.0-beta.8",
     "babel-eslint": "^10.0.1",
-    "eslint": "^5.15.1",
+    "eslint": "^6.1.0",
     "eslint-config-prettier": "^4.1.0",
     "eslint-config-standard": ">=12.0.0",
     "eslint-plugin-import": ">=2.16.0",

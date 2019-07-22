@@ -41,7 +41,48 @@ export default {
   /*
    ** Nuxt.js modules
    */
-  modules: ['@nuxtjs/vuetify', '@nuxtjs/pwa', '@nuxtjs/eslint-module'],
+  modules: [
+    '@nuxtjs/vuetify',
+    '@nuxtjs/pwa',
+    '@nuxtjs/eslint-module',
+    [
+      'nuxt-fire',
+      {
+        // Required:
+        config: {
+          development: {
+            apiKey: process.env.FIREBASE_KEY,
+            authDomain: 'ranked-vote.firebaseapp.com',
+            databaseURL: 'https://ranked-vote.firebaseio.com',
+            projectId: 'ranked-vote',
+            storageBucket: 'ranked-vote.appspot.com',
+            messagingSenderId: '169315955849',
+            appId: '1:169315955849:web:f34f758bb22da748'
+          },
+          production: {
+            apiKey: process.env.FIREBASE_KEY,
+            authDomain: 'ranked-vote.firebaseapp.com',
+            databaseURL: 'https://ranked-vote.firebaseio.com',
+            projectId: 'ranked-vote',
+            storageBucket: 'ranked-vote.appspot.com',
+            messagingSenderId: '169315955849',
+            appId: '1:169315955849:web:f34f758bb22da748'
+          }
+        },
+        // The following options are optional:
+        useOnly: [
+          // 'auth',
+          'firestore'
+          // 'functions',
+          // 'storage',
+          // 'realtimeDb',
+          // 'messaging'
+        ],
+        customEnv: false,
+        functionsLocation: 'us-east1'
+      }
+    ]
+  ],
   /*
    ** vuetify module configuration
    ** https://github.com/nuxt-community/vuetify-module

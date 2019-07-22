@@ -4,7 +4,9 @@
       <nuxt-link to="/" class="toolbar-title">
         <v-toolbar-title class="headline text-uppercase">
           <span>Ranked</span>
-          <span class="font-weight-light">Voting System</span>
+          <span class="font-weight-light">
+            Voting System
+          </span>
         </v-toolbar-title>
       </nuxt-link>
       <v-spacer />
@@ -31,27 +33,7 @@
 <script>
 export default {
   data() {
-    return {
-      clipped: false,
-      drawer: false,
-      fixed: false,
-      items: [
-        {
-          icon: 'apps',
-          title: 'Welcome',
-          to: '/'
-        },
-        {
-          icon: 'bubble_chart',
-          title: 'Inspire',
-          to: '/inspire'
-        }
-      ],
-      miniVariant: false,
-      right: true,
-      rightDrawer: false,
-      title: 'Vuetify.js'
-    }
+    return {}
   }
 }
 </script>
