@@ -155,20 +155,15 @@ export default {
       },
       deep: true
     },
-    saveEnabled() {
-      this.pollChanged(this.poll)
+    saveEnabled(val) {
+      if (val) {
+        this.pollChanged(this.poll)
+      }
     }
   },
   created() {
-    if (this.id) {
-      if (!this.poll) {
-        this.isLoading = true
-      }
-    } else {
-      // eslint-disable-next-line
-      this.Hashids = new Hashids.default()
-      this.id = this.Hashids.encode(Date.now())
-      // this.$fireStore.collection('polls').doc(this.id).set(this.poll);
+    if (this.id && !this.poll) {
+      this.isLoading = true
     }
   },
   methods: {
@@ -230,11 +225,36 @@ export default {
       }
     },
     save() {
+      if (!this.id) {
+        // eslint-disable-next-line
+        this.pollHash = new Hashids.default(
+          'RankedVote',
+          6,
+          'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
+        )
+        this.id = this.pollHash.encode(Date.now())
+      }
+
+      if (!this.poll.password) {
+        // eslint-disable-next-line
+        this.poll.password = new Hashids.default(
+          'RankedVote' +
+            this.id +
+            'password' +
+            Math.floor(Math.random() * 100 + 1),
+          14
+        ).encode(Date.now())
+      }
+
+      if (!this.poll.createdAt) {
+        this.poll.createdAt = this.$fireStoreObj.Timestamp.now()
+      }
+
       this.$fireStore
         .collection('polls')
         .doc(this.id)
         .set(this.poll)
-      this.$router.replace('/' + this.id)
+      this.$router.replace('/' + this.id + '/edit/' + this.poll.password)
     },
     focusEditDialog() {
       if (Object.prototype.hasOwnProperty.call(this.$refs, 'editDialogText')) {
