@@ -224,15 +224,20 @@ export default {
         this.isLoading = false
       }
     },
-    save() {
+    async save() {
       if (!this.id) {
+        const statsRef = this.$fireStore.collection('polls').doc('--stats--')
+        const increment = this.$fireStoreObj.FieldValue.increment(1)
+        await statsRef.update({ pollCount: increment })
+        const nextId = (await statsRef.get()).data().pollCount
+
         // eslint-disable-next-line
         this.pollHash = new Hashids.default(
           'RankedVote',
-          6,
+          4,
           'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
         )
-        this.id = this.pollHash.encode(Date.now())
+        this.id = this.pollHash.encode(nextId)
       }
 
       if (!this.poll.password) {
