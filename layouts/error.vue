@@ -7,10 +7,14 @@
 
       <v-flex mb-4>
         <h1 class="display-2 font-weight-bold mb-3">
-          Page not found
+          {{ errorTitle }}
         </h1>
         <p class="subheading font-weight-regular">
-          The page you are looking for doesn't exist.
+          {{
+            error.statusCode === 404
+              ? "The page you are looking for doesn't exist."
+              : 'There was an unknown error'
+          }}
         </p>
       </v-flex>
     </v-layout>
@@ -27,16 +31,17 @@ export default {
     }
   },
   head() {
-    const title =
-      this.error.statusCode === 404 ? this.pageNotFound : this.otherError
+    const title = this.errorTitle
     return {
       title
     }
   },
   data() {
     return {
-      pageNotFound: '404 Not Found',
-      otherError: 'An error occurred'
+      pageNotFound: 'Page Not Found',
+      otherError: 'An error occurred (' + this.error.statusCode + ')',
+      errorTitle:
+        this.error.statusCode === 404 ? this.pageNotFound : this.otherError
     }
   }
 }
