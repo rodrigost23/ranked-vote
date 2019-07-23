@@ -112,6 +112,12 @@ const Hashids = require('hashids')
 export default {
   components: { draggable },
   props: {
+    type: {
+      default: 'view',
+      validator(value) {
+        return ['view', 'create', 'edit'].indexOf(value) !== -1
+      }
+    },
     pollId: { type: String, default: null },
     pollData: {
       type: Object,
@@ -119,6 +125,10 @@ export default {
         title: null,
         candidates: [{ id: 1, name: null, show: true, hide: false }]
       })
+    },
+    pollPassword: {
+      type: String,
+      default: null
     }
   },
   data() {
@@ -126,6 +136,7 @@ export default {
       Hashids: null,
       id: this.pollId,
       poll: this.pollData,
+      password: this.pollPassword,
       itemsMax: 1,
       tempName: null,
       drag: false,
@@ -240,15 +251,21 @@ export default {
         this.id = this.pollHash.encode(nextId)
       }
 
-      if (!this.poll.password) {
+      const batch = this.$fireStore.batch()
+      if (!this.password) {
         // eslint-disable-next-line
-        this.poll.password = new Hashids.default(
+        this.password = new Hashids.default(
           'RankedVote' +
             this.id +
             'password' +
             Math.floor(Math.random() * 100 + 1),
           14
         ).encode(Date.now())
+
+        this.$fireStore
+          .collection('passwords')
+          .doc(this.id)
+          .set({ password: this.password })
       }
 
       if (!this.poll.createdAt) {
@@ -259,7 +276,8 @@ export default {
         .collection('polls')
         .doc(this.id)
         .set(this.poll)
-      this.$router.replace('/' + this.id + '/edit/' + this.poll.password)
+      batch.commit()
+      this.$router.replace('/' + this.id + '/edit/' + this.password)
     },
     focusEditDialog() {
       if (Object.prototype.hasOwnProperty.call(this.$refs, 'editDialogText')) {

@@ -1,5 +1,5 @@
 <template>
-  <poll :poll-id="pollId" :poll-data="pollData" />
+  <poll type="view" :poll-id="pollId" :poll-data="pollData" />
 </template>
 
 <script>

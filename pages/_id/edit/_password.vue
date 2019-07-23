@@ -1,5 +1,10 @@
 <template>
-  <poll :poll-id="pollId" :poll-data="pollData" />
+  <poll
+    type="edit"
+    :poll-id="pollId"
+    :poll-data="pollData"
+    :poll-password="pollPassword"
+  />
 </template>
 
 <script>
@@ -14,7 +19,11 @@ export default {
         .collection('polls')
         .doc(pollId)
         .get()
-      return { pollId, pollData: pollData.data() }
+      return {
+        pollId,
+        pollData: pollData.data(),
+        pollPassword: params.password
+      }
     } catch (e) {
       error({ statusCode: 404 })
     }
