@@ -42,5 +42,6 @@
     "prettier": "^1.18.2",
     "stylus": "^0.54.5",
     "stylus-loader": "^3.0.2"
-  }
+  },
+  "types": "index.d.ts"
 }
