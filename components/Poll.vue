@@ -203,6 +203,14 @@ export default {
 
     if (this.isCreate) {
       this.poll.createdAt = this.$fireStoreObj.Timestamp.now()
+    } else {
+      const me = this
+      this.$fireStore
+        .collection('polls')
+        .doc(this.id)
+        .onSnapshot((doc) => {
+          me.poll = doc.data()
+        })
     }
   },
   methods: {
