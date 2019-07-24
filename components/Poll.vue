@@ -7,7 +7,7 @@
             <v-progress-circular indeterminate color="primary" />
           </v-overlay>
           <v-card-title primary-title :class="{ 'grey--text': !poll.title }">
-            <h3>
+            <h3 v-if="!isView">
               <v-edit-dialog
                 :return-value.sync="poll.title"
                 lazy
@@ -24,6 +24,9 @@
                   />
                 </template>
               </v-edit-dialog>
+            </h3>
+            <h3 v-if="isView">
+              {{ poll.title || 'No title' }}
             </h3>
           </v-card-title>
           <v-list flat>
@@ -47,6 +50,7 @@
                           :class="{ 'grey--text': !item.name }"
                         >
                           <v-edit-dialog
+                            v-if="!isView"
                             :return-value.sync="item.name"
                             lazy
                             style="top:-100px"
@@ -63,9 +67,12 @@
                               />
                             </template>
                           </v-edit-dialog>
+                          <span v-if="isView">
+                            {{ item.name || 'No name' }}
+                          </span>
                         </v-list-item-title>
                       </v-list-item-content>
-                      <v-list-item-icon>
+                      <v-list-item-icon v-if="!isView">
                         <v-tooltip left>
                           <template v-slot:activator="{ on }">
                             <v-btn
@@ -86,7 +93,7 @@
               </template>
             </draggable>
 
-            <v-expand-transition>
+            <v-expand-transition v-if="!isView">
               <div style="overflow:hidden">
                 <v-list-item :disabled="!newEnabled" @click="newItem">
                   <v-list-item-avatar>
@@ -107,6 +114,7 @@
 
 <script>
 import draggable from 'vuedraggable'
+import { Promise } from 'q'
 const Hashids = require('hashids')
 
 export default {
@@ -157,6 +165,15 @@ export default {
         group: 'description',
         disabled: false
       }
+    },
+    isView() {
+      return this.type === 'view'
+    },
+    isCreate() {
+      return this.type === 'create'
+    },
+    isEdit() {
+      return this.type === 'edit'
     }
   },
   watch: {
@@ -175,6 +192,17 @@ export default {
   created() {
     if (this.id && !this.poll) {
       this.isLoading = true
+    }
+
+    if (this.password) {
+      this.$fireAuth.signInWithEmailAndPassword(
+        this.password + '@ranked.vote',
+        this.password
+      )
+    }
+
+    if (this.isCreate) {
+      this.poll.createdAt = this.$fireStoreObj.Timestamp.now()
     }
   },
   methods: {
@@ -216,10 +244,7 @@ export default {
           val.candidates[0].id
         )
         if (this.saveEnabled) {
-          this.$fireStore
-            .collection('polls')
-            .doc(this.id)
-            .set(val)
+          this.save()
         }
         for (const i in val.candidates) {
           if (Object.prototype.hasOwnProperty.call(val.candidates, i)) {
@@ -236,7 +261,9 @@ export default {
       }
     },
     async save() {
-      if (!this.id) {
+      if (this.isCreate) {
+        this.isLoading = true
+
         const statsRef = this.$fireStore.collection('polls').doc('--stats--')
         const increment = this.$fireStoreObj.FieldValue.increment(1)
         await statsRef.update({ pollCount: increment })
@@ -248,37 +275,52 @@ export default {
           4,
           'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
         )
-        this.id = this.pollHash.encode(nextId)
-      }
 
-      const batch = this.$fireStore.batch()
-      if (!this.password) {
+        this.id = this.pollHash.encode(nextId)
+
         // eslint-disable-next-line
         this.password = new Hashids.default(
           'RankedVote' +
             this.id +
             'password' +
             Math.floor(Math.random() * 100 + 1),
-          14
+          14,
+          'abcdefghijklmnopqrstuvwxyz0123456789&_+='
         ).encode(Date.now())
 
-        this.$fireStore
-          .collection('passwords')
+        Promise.all([
+          this.$fireStore
+            .collection('passwords')
+            .doc(this.id)
+            .set({ password: this.password }),
+          this.$fireAuth.createUserWithEmailAndPassword(
+            this.password + '@ranked.vote',
+            this.password
+          ),
+          this.$fireStore
+            .collection('polls')
+            .doc(this.id)
+            .set(this.poll)
+        ]).then(() => {
+          this.$router.replace('/' + this.id + '/edit/' + this.password)
+        })
+      } else {
+        if (
+          this.$fireAuth.currentUser ||
+          this.$fireAuth.currentUser.email !== this.password + '@ranked.vote'
+        ) {
+          await this.$fireAuth.signInWithEmailAndPassword(
+            this.password + '@ranked.vote',
+            this.password
+          )
+        }
+        await this.$fireStore
+          .collection('polls')
           .doc(this.id)
-          .set({ password: this.password })
+          .set(this.poll)
       }
-
-      if (!this.poll.createdAt) {
-        this.poll.createdAt = this.$fireStoreObj.Timestamp.now()
-      }
-
-      this.$fireStore
-        .collection('polls')
-        .doc(this.id)
-        .set(this.poll)
-      batch.commit()
-      this.$router.replace('/' + this.id + '/edit/' + this.password)
     },
+
     focusEditDialog() {
       if (Object.prototype.hasOwnProperty.call(this.$refs, 'editDialogText')) {
         this.$refs.editDialogText[0].focus()

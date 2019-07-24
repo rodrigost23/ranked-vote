@@ -6,15 +6,7 @@
 import poll from '~/components/Poll.vue'
 
 export default {
-  components: { poll },
-  async created() {
-    console.log(
-      await this.$fireStore
-        .collection('polls')
-        .doc('LkeD')
-        .get()
-    )
-  }
+  components: { poll }
 }
 </script>
 
