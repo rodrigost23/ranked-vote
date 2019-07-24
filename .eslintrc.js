@@ -21,6 +21,7 @@ module.exports = {
   // add your custom rules here
   rules: {
     "no-console": "warn",
+    "space-before-function-paren": 0,
     "vue/singleline-html-element-content-newline": ["warn", {
       "ignoreWhenNoAttributes": true,
       "ignoreWhenEmpty": true,
