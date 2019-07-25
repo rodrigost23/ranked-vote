@@ -8,11 +8,11 @@ module.exports = {
     parser: 'babel-eslint'
   },
   extends: [
+    '@nuxtjs',
+    'plugin:nuxt/recommended',
     'prettier',
     'prettier/vue',
     'plugin:prettier/recommended',
-    '@nuxtjs',
-    'plugin:nuxt/recommended'
   ],
   plugins: [
     'prettier',
@@ -20,12 +20,15 @@ module.exports = {
   ],
   // add your custom rules here
   rules: {
+    "prettier/prettier": "warn",
     "no-console": "warn",
-    "space-before-function-paren": 0,
     "vue/singleline-html-element-content-newline": ["warn", {
       "ignoreWhenNoAttributes": true,
       "ignoreWhenEmpty": true,
-      "ignores": ["pre", "textarea", "v-icon"]
+      "ignores": ["pre", "textarea", "v-icon", "span", "h1", "h2", "h3", "h4", "h5"]
+    }],
+    "vue/multiline-html-element-content-newline": ["warn", {
+      "ignores": ["v-icon"]
     }],
     'vuetify/no-deprecated-classes': 'error'
     // 'vuetify/grid-unknown-attributes': 'error',

@@ -25,9 +25,7 @@
                 </template>
               </v-edit-dialog>
             </h3>
-            <h3 v-if="isView">
-              {{ poll.title || 'No title' }}
-            </h3>
+            <h3 v-else>{{ poll.title || 'No title' }}</h3>
             <v-spacer />
             <v-progress-circular
               v-show="isSaving"
@@ -37,69 +35,156 @@
             />
           </v-card-title>
           <v-list flat>
-            <v-subheader>CANDIDATES</v-subheader>
-            <draggable
-              v-model="candidates"
-              v-bind="dragOptions"
-              :group="{ name: 'candidates' }"
-              ghost-class="elevation-1"
-              handle=".handle"
-              @end="save"
-            >
-              <template v-for="item in poll ? poll.candidates : null">
-                <v-expand-transition :key="item.id">
-                  <div v-show="item.show && !item.hide" style="overflow:hidden">
-                    <v-list-item>
-                      <v-list-item-avatar class="handle">
-                        <v-icon>mdi-drag</v-icon>
-                      </v-list-item-avatar>
-                      <v-list-item-content>
-                        <v-list-item-title
-                          :class="{ 'grey--text': !item.name }"
-                        >
-                          <v-edit-dialog
-                            v-if="!isView"
-                            :return-value.sync="item.name"
-                            lazy
-                            style="top:-100px"
-                            @open="tempName = item.name"
-                            @cancel="item.name = tempName || item.name"
-                            @save="save()"
-                          >
-                            {{ item.name || 'Click to set candidate name' }}
-                            <template v-slot:input>
-                              <v-text-field
-                                v-model="item.name"
-                                label="Candidate name"
-                                single-line
-                              />
-                            </template>
-                          </v-edit-dialog>
-                          <span v-if="isView">
-                            {{ item.name || 'No name' }}
-                          </span>
-                        </v-list-item-title>
-                      </v-list-item-content>
-                      <v-list-item-icon v-if="!isView">
-                        <v-tooltip left>
-                          <template v-slot:activator="{ on }">
-                            <v-btn
-                              icon
-                              large
-                              v-on="on"
-                              @click="removeItem(item.id)"
+            <v-layout>
+              <v-flex v-if="isView" xs6>
+                <v-subheader>YOUR VOTE</v-subheader>
+                <draggable
+                  v-model="vote"
+                  :list="vote"
+                  group="candidates"
+                  :animation="200"
+                  ghost-class="elevation-1"
+                  handle=".handle"
+                >
+                  <template v-for="item in vote">
+                    <v-expand-transition :key="item.id">
+                      <div
+                        v-show="item.show && !item.hide"
+                        style="overflow:hidden"
+                      >
+                        <v-list-item>
+                          <v-list-item-avatar class="handle">
+                            <v-icon>mdi-drag</v-icon>
+                          </v-list-item-avatar>
+                          <v-list-item-content>
+                            <v-list-item-title
+                              :class="{ 'grey--text': !item.name }"
                             >
-                              <v-icon>mdi-minus-circle</v-icon>
-                            </v-btn>
-                          </template>
-                          <span>Remove candidate</span>
-                        </v-tooltip>
-                      </v-list-item-icon>
-                    </v-list-item>
-                  </div>
-                </v-expand-transition>
-              </template>
-            </draggable>
+                              <v-edit-dialog
+                                v-if="!isView"
+                                :return-value.sync="item.name"
+                                lazy
+                                style="top:-100px"
+                                @open="tempName = item.name"
+                                @cancel="item.name = tempName || item.name"
+                                @save="save()"
+                              >
+                                {{ item.name || 'Click to set candidate name' }}
+                                <template v-slot:input>
+                                  <v-text-field
+                                    v-model="item.name"
+                                    label="Candidate name"
+                                    single-line
+                                  />
+                                </template>
+                              </v-edit-dialog>
+                              <!-- prettier-ignore -->
+                              <span v-if="isView">{{ item.name || 'No name' }}</span>
+                            </v-list-item-title>
+                          </v-list-item-content>
+                          <v-list-item-icon v-if="!isView">
+                            <v-tooltip left>
+                              <template v-slot:activator="{ on }">
+                                <v-btn
+                                  icon
+                                  large
+                                  v-on="on"
+                                  @click="removeItem(item.id)"
+                                >
+                                  <v-icon>mdi-minus-circle</v-icon>
+                                </v-btn>
+                              </template>
+                              <span>Remove candidate</span>
+                            </v-tooltip>
+                          </v-list-item-icon>
+                        </v-list-item>
+                      </div>
+                    </v-expand-transition>
+                  </template>
+                </draggable>
+              </v-flex>
+              <v-flex
+                v-if="!isView || candidates.length > 0"
+                :xs6="isView"
+                :xs12="!isView"
+              >
+                <v-subheader>CANDIDATES</v-subheader>
+                <draggable
+                  v-model="candidates"
+                  group="candidates"
+                  :animation="200"
+                  ghost-class="elevation-1"
+                  handle=".handle"
+                  :draggable="!isView"
+                  @change="!isView ? save() : undefined"
+                >
+                  <template v-for="item in candidates">
+                    <v-expand-transition :key="item.id">
+                      <div
+                        v-show="item.show && !item.hide"
+                        style="overflow:hidden"
+                      >
+                        <v-list-item>
+                          <v-list-item-icon>
+                            <!-- prettier-ignore -->
+                            <v-icon v-if="!isView" class="handle">mdi-drag</v-icon>
+                            <v-tooltip v-else top>
+                              <template v-slot:activator="{ on }">
+                                <v-btn icon v-on="on" @click="addToVote(item)">
+                                  <v-icon>mdi-arrow-left-bold</v-icon>
+                                </v-btn>
+                              </template>
+                              <span>Add to votes list</span>
+                            </v-tooltip>
+                          </v-list-item-icon>
+                          <v-list-item-content>
+                            <v-list-item-title
+                              :class="{ 'grey--text': !item.name }"
+                            >
+                              <v-edit-dialog
+                                v-if="!isView"
+                                :return-value.sync="item.name"
+                                lazy
+                                style="top:-100px"
+                                @open="tempName = item.name"
+                                @cancel="item.name = tempName || item.name"
+                                @save="save()"
+                              >
+                                {{ item.name || 'Click to set candidate name' }}
+                                <template v-slot:input>
+                                  <v-text-field
+                                    v-model="item.name"
+                                    label="Candidate name"
+                                    single-line
+                                  />
+                                </template>
+                              </v-edit-dialog>
+                              <!-- prettier-ignore -->
+                              <span v-if="isView">{{ item.name || 'No name' }}</span>
+                            </v-list-item-title>
+                          </v-list-item-content>
+                          <v-list-item-icon v-if="!isView">
+                            <v-tooltip left>
+                              <template v-slot:activator="{ on }">
+                                <v-btn
+                                  icon
+                                  large
+                                  v-on="on"
+                                  @click="removeItem(item.id)"
+                                >
+                                  <v-icon>mdi-minus-circle</v-icon>
+                                </v-btn>
+                              </template>
+                              <span>Remove candidate</span>
+                            </v-tooltip>
+                          </v-list-item-icon>
+                        </v-list-item>
+                      </div>
+                    </v-expand-transition>
+                  </template>
+                </draggable>
+              </v-flex>
+            </v-layout>
 
             <v-expand-transition v-if="!isView">
               <div style="overflow:hidden">
@@ -152,6 +237,7 @@ export default {
       Hashids: null,
       id: this.pollId,
       poll: this.pollData,
+      vote: [],
       password: this.pollPassword,
       itemsMax: 1,
       tempName: null,
@@ -163,19 +249,20 @@ export default {
     }
   },
   computed: {
-    dragOptions() {
-      return {
-        animation: 200,
-        group: 'description',
-        disabled: false
-      }
-    },
     candidates: {
       get() {
-        return this.poll ? this.poll.candidates : []
+        console.log(this.vote)
+        return this.poll
+          ? this.poll.candidates.filter(
+              (candidate) =>
+                !this.vote.find((value) => value.id === candidate.id)
+            )
+          : []
       },
       set(val) {
-        this.poll.candidates = val
+        if (!this.isView) {
+          this.poll.candidates = val
+        }
       }
     },
     isView() {
@@ -256,6 +343,9 @@ export default {
           break
         }
       }
+    },
+    addToVote(item) {
+      this.vote.push(item)
     },
     pollChanged(val) {
       if (val) {
