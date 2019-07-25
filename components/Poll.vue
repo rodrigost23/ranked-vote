@@ -2,8 +2,8 @@
   <v-layout wrap>
     <v-flex xs12 sm10 offset-sm1 md6 offset-md3>
       <v-expand-transition>
-        <v-card :elevation="isLoading ? 0 : 4">
-          <v-overlay :absolute="true" :value="isLoading" opacity="0.1">
+        <v-card :tile="$vuetify.breakpoint.xs" :loading="isLoading">
+          <v-overlay :absolute="true" :value="false" opacity="0.1">
             <v-progress-circular indeterminate color="primary" />
           </v-overlay>
           <v-card-title primary-title :class="{ 'grey--text': !poll.title }">
@@ -28,15 +28,23 @@
             <h3 v-if="isView">
               {{ poll.title || 'No title' }}
             </h3>
+            <v-spacer />
+            <v-progress-circular
+              v-show="isSaving"
+              indeterminate
+              color="primary"
+              size="24"
+            />
           </v-card-title>
           <v-list flat>
             <v-subheader>CANDIDATES</v-subheader>
             <draggable
-              :v-model="poll ? poll.candidates : null"
+              v-model="candidates"
               v-bind="dragOptions"
               :group="{ name: 'candidates' }"
               ghost-class="elevation-1"
               handle=".handle"
+              @end="save"
             >
               <template v-for="item in poll ? poll.candidates : null">
                 <v-expand-transition :key="item.id">
@@ -150,13 +158,9 @@ export default {
       drag: false,
       newEnabled: false,
       saveEnabled: false,
-      isLoading: false
+      isLoading: false,
+      isSaving: false
     }
-  },
-  firestore() {
-    return this.id
-      ? { poll: this.$fireStore.collection('polls').doc(this.id) }
-      : null
   },
   computed: {
     dragOptions() {
@@ -164,6 +168,14 @@ export default {
         animation: 200,
         group: 'description',
         disabled: false
+      }
+    },
+    candidates: {
+      get() {
+        return this.poll ? this.poll.candidates : []
+      },
+      set(val) {
+        this.poll.candidates = val
       }
     },
     isView() {
@@ -293,7 +305,7 @@ export default {
             'password' +
             Math.floor(Math.random() * 100 + 1),
           14,
-          'abcdefghijklmnopqrstuvwxyz0123456789&_+='
+          'abcdefghijklmnopqrstuvwxyz0123456789&'
         ).encode(Date.now())
 
         Promise.all([
@@ -313,6 +325,7 @@ export default {
           this.$router.replace('/' + this.id + '/edit/' + this.password)
         })
       } else {
+        this.isSaving = true
         if (
           this.$fireAuth.currentUser ||
           this.$fireAuth.currentUser.email !== this.password + '@ranked.vote'
@@ -325,7 +338,8 @@ export default {
         await this.$fireStore
           .collection('polls')
           .doc(this.id)
-          .set(this.poll)
+          .update(this.poll)
+        this.isSaving = false
       }
     },
 
