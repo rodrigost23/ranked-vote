@@ -38,12 +38,46 @@
             >
               {{ voteSaved ? 'Saved' : 'Save' }}
             </v-btn>
-            <v-fade-transition v-else>
-              <span v-show="isSaving" class="caption grey--text">
-                Saving...
-                <v-progress-circular indeterminate color="grey" size="24" />
-              </span>
-            </v-fade-transition>
+            <span v-else>
+              <v-fade-transition>
+                <span v-show="isSaving" class="caption grey--text">
+                  Saving...
+                  <v-progress-circular indeterminate color="grey" size="24" />
+                </span>
+              </v-fade-transition>
+              <v-fade-transition>
+                <span v-show="!isSaving">
+                  <v-menu :close-on-content-click="false" offset-x>
+                    <template v-slot:activator="{ on }">
+                      <v-btn icon small v-on="on">
+                        <v-icon>mdi-share-variant</v-icon>
+                      </v-btn>
+                    </template>
+
+                    <v-card>
+                      <v-card-title class="subtitle-2">
+                        Share link to this poll
+                      </v-card-title>
+                      <v-card-text>
+                        <v-text-field
+                          ref="shareText"
+                          single-line
+                          outlined
+                          solo
+                          flat
+                          readonly
+                          :value="shareUrl"
+                          hide-details
+                          append-icon="mdi-content-copy"
+                          @focus="$event.target.select()"
+                          @click:append="copy"
+                        ></v-text-field>
+                      </v-card-text>
+                    </v-card>
+                  </v-menu>
+                </span>
+              </v-fade-transition>
+            </span>
           </v-card-title>
           <v-list flat>
             <v-layout>
@@ -63,10 +97,11 @@
                   @start="drag = true"
                   @end="drag = false"
                 >
-                  <template v-for="(item, i) in vote">
-                    <v-expand-transition :key="item.id">
+                  <transition-group :name="!drag ? 'flip-list' : null">
+                    <template v-for="(item, i) in vote">
                       <div
                         v-show="item.show && !item.hide"
+                        :key="item.id"
                         style="overflow:hidden"
                         class="handle"
                       >
@@ -118,8 +153,8 @@
                           </v-list-item-icon>
                         </v-list-item>
                       </div>
-                    </v-expand-transition>
-                  </template>
+                    </template>
+                  </transition-group>
                 </draggable>
               </v-flex>
               <v-flex
@@ -308,6 +343,10 @@ export default {
     },
     isEdit() {
       return this.type === 'edit'
+    },
+    shareUrl() {
+      const addr = window.location.href.split('/')
+      return addr[0] + '//' + addr[2] + '/' + this.id
     }
   },
   watch: {
@@ -348,6 +387,12 @@ export default {
     }
   },
   methods: {
+    copy() {
+      const input = this.$refs.shareText
+      input.focus()
+      document.execCommand('selectAll')
+      this.copied = document.execCommand('copy')
+    },
     newItem() {
       if (!this.newEnabled) return
 
@@ -520,5 +565,8 @@ export default {
 .short-fade-enter,
 .short-fade-leave-to {
   opacity: 0;
+}
+.flip-list-move {
+  transition: transform 200ms;
 }
 </style>
