@@ -3,10 +3,7 @@
     <v-app-bar app dark color="blue" elevate-on-scroll>
       <nuxt-link to="/" class="toolbar-title">
         <v-toolbar-title class="headline text-uppercase">
-          <span>Ranked</span>
-          <span class="font-weight-light">
-            Voting System
-          </span>
+          {{ title }}
         </v-toolbar-title>
       </nuxt-link>
       <v-spacer />
@@ -34,6 +31,17 @@
 export default {
   data() {
     return {}
+  },
+  head() {
+    const self = this
+    if (process.browser) {
+      this.title = document.title
+    }
+    return {
+      changed({ title }) {
+        self.title = title
+      }
+    }
   }
 }
 </script>
