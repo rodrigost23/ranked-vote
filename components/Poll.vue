@@ -33,48 +33,17 @@
               rounded
               color="primary"
               :loading="isSaving"
-              :disabled="isSaving || voteSaved"
+              :disabled="isSaving || voteSaved || !isVoteComplete"
               @click="saveVote()"
             >
               {{ voteSaved ? 'Saved' : 'Save' }}
             </v-btn>
-            <span v-else>
+            <span v-else style="height: 40px">
               <v-fade-transition>
-                <span v-show="isSaving" class="caption grey--text">
-                  Saving...
-                  <v-progress-circular indeterminate color="grey" size="24" />
-                </span>
-              </v-fade-transition>
-              <v-fade-transition>
-                <span v-show="!isSaving">
-                  <v-menu :close-on-content-click="false" offset-x>
-                    <template v-slot:activator="{ on }">
-                      <v-btn icon small v-on="on">
-                        <v-icon>mdi-share-variant</v-icon>
-                      </v-btn>
-                    </template>
-
-                    <v-card>
-                      <v-card-title class="subtitle-2">
-                        Share link to this poll
-                      </v-card-title>
-                      <v-card-text>
-                        <v-text-field
-                          ref="shareText"
-                          single-line
-                          outlined
-                          solo
-                          flat
-                          readonly
-                          :value="shareUrl"
-                          hide-details
-                          append-icon="mdi-content-copy"
-                          @focus="$event.target.select()"
-                          @click:append="copy"
-                        ></v-text-field>
-                      </v-card-text>
-                    </v-card>
-                  </v-menu>
+                <share-button v-if="!isSaving" :value="shareUrl" />
+                <span v-else class="caption grey--text">
+                  Saving&hellip;&nbsp;
+                  <v-progress-circular indeterminate color="grey" size="28" />
                 </span>
               </v-fade-transition>
             </span>
@@ -83,8 +52,8 @@
             <v-layout>
               <v-flex
                 v-if="isView"
-                :xs6="candidates.length > 0"
-                :xs12="candidates.length == 0"
+                :xs6="!isVoteComplete"
+                :xs12="isVoteComplete"
               >
                 <v-subheader>YOUR VOTE</v-subheader>
                 <draggable
@@ -112,7 +81,7 @@
                               color="primary"
                               class="white--text"
                             >
-                              <transition name="short-fade" :appear="true">
+                              <transition name="short-fade" appear>
                                 <span v-show="!drag">{{ i + 1 }}</span>
                               </transition>
                             </v-avatar>
@@ -158,7 +127,7 @@
                 </draggable>
               </v-flex>
               <v-flex
-                v-show="!isView || candidates.length > 0"
+                v-show="!isView || !isVoteComplete"
                 :xs6="isView"
                 :xs12="!isView"
               >
@@ -172,77 +141,76 @@
                   :disabled="isView"
                   @change="!isView ? save() : undefined"
                 >
-                  <template v-for="item in candidates">
-                    <v-expand-transition :key="item.id">
-                      <div
-                        v-show="item.show && !item.hide"
-                        style="overflow:hidden"
-                      >
-                        <v-list-item>
-                          <v-list-item-icon v-if="isView">
-                            <v-tooltip top>
-                              <template v-slot:activator="{ on }">
-                                <v-btn
-                                  icon
-                                  small
-                                  v-on="on"
-                                  @click="addToVote(item)"
-                                >
-                                  <v-icon>mdi-arrow-left-bold</v-icon>
-                                </v-btn>
-                              </template>
-                              <span>Add to votes list</span>
-                            </v-tooltip>
-                          </v-list-item-icon>
-                          <v-list-item-avatar v-else class="handle">
-                            <!-- prettier-ignore -->
-                            <v-icon>mdi-drag</v-icon>
-                          </v-list-item-avatar>
-                          <v-list-item-content>
-                            <v-list-item-title
-                              :class="{ 'grey--text': !item.name }"
-                            >
-                              <v-edit-dialog
-                                v-if="!isView"
-                                :return-value.sync="item.name"
-                                lazy
-                                style="top:-100px"
-                                @open="tempName = item.name"
-                                @cancel="item.name = tempName || item.name"
-                                @save="save()"
+                  <transition-group :name="!drag ? 'list' : null" appear>
+                    <div
+                      v-for="item in candidates"
+                      :key="item.id"
+                      style="overflow:hidden"
+                    >
+                      <v-list-item>
+                        <v-list-item-icon v-if="isView">
+                          <v-tooltip top>
+                            <template v-slot:activator="{ on }">
+                              <v-btn
+                                icon
+                                small
+                                v-on="on"
+                                @click="addToVote(item)"
                               >
-                                {{ item.name || 'Click to set candidate name' }}
-                                <template v-slot:input>
-                                  <v-text-field
-                                    v-model="item.name"
-                                    label="Candidate name"
-                                    single-line
-                                  />
-                                </template>
-                              </v-edit-dialog>
-                              <!-- prettier-ignore -->
-                              <span v-if="isView">{{ item.name || 'No name' }}</span>
-                            </v-list-item-title>
-                          </v-list-item-content>
-                          <v-list-item-icon v-if="!isView">
-                            <v-tooltip left>
-                              <template v-slot:activator="{ on }">
-                                <v-btn
-                                  icon
-                                  small
-                                  v-on="on"
-                                  @click="removeItem(item.id)"
-                                >
-                                  <v-icon>mdi-minus-circle</v-icon>
-                                </v-btn>
+                                <v-icon>mdi-arrow-left-bold</v-icon>
+                              </v-btn>
+                            </template>
+                            <span>Add to votes list</span>
+                          </v-tooltip>
+                        </v-list-item-icon>
+                        <v-list-item-avatar v-else class="handle">
+                          <!-- prettier-ignore -->
+                          <v-icon>mdi-drag</v-icon>
+                        </v-list-item-avatar>
+                        <v-list-item-content>
+                          <v-list-item-title
+                            :class="{ 'grey--text': !item.name }"
+                          >
+                            <v-edit-dialog
+                              v-if="!isView"
+                              :return-value.sync="item.name"
+                              lazy
+                              style="top:-100px"
+                              @open="tempName = item.name"
+                              @cancel="item.name = tempName || item.name"
+                              @save="save()"
+                            >
+                              {{ item.name || 'Click to set candidate name' }}
+                              <template v-slot:input>
+                                <v-text-field
+                                  v-model="item.name"
+                                  label="Candidate name"
+                                  single-line
+                                />
                               </template>
-                              <span>Remove candidate</span>
-                            </v-tooltip>
-                          </v-list-item-icon>
-                        </v-list-item>
-                      </div>
-                    </v-expand-transition>
-                  </template>
+                            </v-edit-dialog>
+                            <!-- prettier-ignore -->
+                            <span v-if="isView">{{ item.name || 'No name' }}</span>
+                          </v-list-item-title>
+                        </v-list-item-content>
+                        <v-list-item-icon v-if="!isView">
+                          <v-tooltip left>
+                            <template v-slot:activator="{ on }">
+                              <v-btn
+                                icon
+                                small
+                                v-on="on"
+                                @click="removeItem(item.id)"
+                              >
+                                <v-icon>mdi-minus-circle</v-icon>
+                              </v-btn>
+                            </template>
+                            <span>Remove candidate</span>
+                          </v-tooltip>
+                        </v-list-item-icon>
+                      </v-list-item>
+                    </div>
+                  </transition-group>
                 </draggable>
               </v-flex>
             </v-layout>
@@ -270,10 +238,11 @@
 import draggable from 'vuedraggable'
 import { Promise } from 'q'
 import upDown from './UpDown.vue'
+import shareButton from './ShareButton'
 const Hashids = require('hashids')
 
 export default {
-  components: { draggable, upDown },
+  components: { draggable, upDown, shareButton },
   props: {
     type: {
       default: 'view',
@@ -335,6 +304,9 @@ export default {
     computedVote() {
       return this.vote.map((candidate) => candidate.id)
     },
+    isVoteComplete() {
+      return this.candidates.length === 0
+    },
     isView() {
       return this.type === 'view'
     },
@@ -387,12 +359,6 @@ export default {
     }
   },
   methods: {
-    copy() {
-      const input = this.$refs.shareText
-      input.focus()
-      document.execCommand('selectAll')
-      this.copied = document.execCommand('copy')
-    },
     newItem() {
       if (!this.newEnabled) return
 
@@ -568,5 +534,18 @@ export default {
 }
 .flip-list-move {
   transition: transform 200ms;
+}
+.list-enter-active,
+.list-leave-active {
+  transition: all 200ms ease;
+}
+.list-enter,
+.list-leave-to {
+  opacity: 0;
+  max-height: 0;
+}
+.list-leave,
+.list-enter-to {
+  max-height: 100px;
 }
 </style>
