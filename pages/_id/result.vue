@@ -23,8 +23,8 @@
                       }"
                     >
                       <v-chip
-                        v-for="item in vote.vote.map(
-                          (v) => poll.candidates.filter((c) => c.id == v)[0]
+                        v-for="item in vote.vote.map((id) =>
+                          candidateFromId(id)
                         )"
                         :key="item.id"
                         class="mx-1"
@@ -39,15 +39,19 @@
               </v-flex>
               <v-flex xs6>
                 <v-subheader>CANDIDATES</v-subheader>
-                <v-list-item v-for="item in poll.candidates" :key="item.id">
+                <v-list-item
+                  v-for="candidate in poll.candidates"
+                  :key="candidate.id"
+                >
                   <v-list-item-content>
                     <v-list-item-title
                       :class="[
-                        !item.name ? 'grey--text' : '',
-                        color(item.id) + '--text'
+                        !candidate.name ? 'grey--text' : '',
+                        color(candidate.id) + '--text'
                       ]"
                     >
-                      {{ item.name || 'Nameless candidate' }}
+                      {{ candidate.name || 'Nameless candidate' }} -
+                      {{ scores[candidate.id] }}
                     </v-list-item-title>
                   </v-list-item-content>
                 </v-list-item>
@@ -111,6 +115,20 @@ export default {
       ]
     }
   },
+  computed: {
+    scores() {
+      const scores = {}
+      this.votes.forEach((v) => {
+        for (let i = 0; i < v.vote.length; i++) {
+          const id = v.vote[i]
+          const score = v.vote.length - i
+          scores[id] = scores[id] ? scores[id] + score : score
+          console.log(this.candidateFromId(id).name, score)
+        }
+      })
+      return scores
+    }
+  },
   async asyncData({ app, params, error }) {
     const pollId = params.id
     try {
@@ -144,6 +162,9 @@ export default {
   methods: {
     color(i) {
       return this.colors[i % this.colors.length]
+    },
+    candidateFromId(id) {
+      return this.poll.candidates.filter((c) => c.id === id)[0]
     }
   }
 }
