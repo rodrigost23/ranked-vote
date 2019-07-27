@@ -15,8 +15,24 @@
                 <v-subheader>VOTES</v-subheader>
                 <v-list-item v-for="vote in votes" :key="vote.id">
                   <v-list-item-content>
-                    <v-list-item-title :class="{ 'grey--text': !vote.name }">
-                      {{ vote.vote || 'Nameless candidate' }}
+                    <v-list-item-title
+                      :class="{
+                        'grey--text': poll.candidates.filter(
+                          (c) => c.id == vote.vote
+                        ).empty
+                      }"
+                    >
+                      <v-chip
+                        v-for="item in vote.vote.map(
+                          (v) => poll.candidates.filter((c) => c.id == v)[0]
+                        )"
+                        :key="item.id"
+                        class="mx-1"
+                        :color="color(item.id)"
+                        outlined
+                      >
+                        {{ item.name }}
+                      </v-chip>
                     </v-list-item-title>
                   </v-list-item-content>
                 </v-list-item>
@@ -25,7 +41,12 @@
                 <v-subheader>CANDIDATES</v-subheader>
                 <v-list-item v-for="item in poll.candidates" :key="item.id">
                   <v-list-item-content>
-                    <v-list-item-title :class="{ 'grey--text': !item.name }">
+                    <v-list-item-title
+                      :class="[
+                        !item.name ? 'grey--text' : '',
+                        color(item.id) + '--text'
+                      ]"
+                    >
                       {{ item.name || 'Nameless candidate' }}
                     </v-list-item-title>
                   </v-list-item-content>
@@ -68,7 +89,26 @@ export default {
   },
   data() {
     return {
-      isLoading: false
+      isLoading: false,
+      colors: [
+        'red',
+        'pink',
+        'purple',
+        'deep-purple',
+        'indigo',
+        'blue',
+        'light-blue',
+        'cyan',
+        'teal',
+        'green',
+        'light-green',
+        'lime',
+        'yellow',
+        'amber',
+        'orange',
+        'deep-orange',
+        'brown'
+      ]
     }
   },
   async asyncData({ app, params, error }) {
@@ -100,6 +140,11 @@ export default {
       .onSnapshot((doc) => {
         self.poll = doc.data()
       })
+  },
+  methods: {
+    color(i) {
+      return this.colors[i % this.colors.length]
+    }
   }
 }
 </script>
