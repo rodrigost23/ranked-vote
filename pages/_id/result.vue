@@ -164,7 +164,17 @@
 export default {
   head() {
     return {
-      title: this.poll.title
+      title: this.poll.title,
+      meta: [
+        { hid: 'name', itemprop: 'name', content: this.poll.title },
+        { hid: 'twitter:card', name: 'twitter:card', content: 'app' },
+        {
+          hid: 'twitter:title',
+          name: 'twitter:title',
+          content: this.poll.title
+        },
+        { hid: 'og:title', name: 'og:title', content: this.poll.title }
+      ]
     }
   },
   data() {

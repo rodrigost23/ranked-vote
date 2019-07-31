@@ -12,6 +12,21 @@ import poll from '~/components/Poll.vue'
 
 export default {
   components: { poll },
+  head() {
+    return {
+      title: this.poll.title,
+      meta: [
+        { hid: 'name', itemprop: 'name', content: this.poll.title },
+        { hid: 'twitter:card', name: 'twitter:card', content: 'app' },
+        {
+          hid: 'twitter:title',
+          name: 'twitter:title',
+          content: this.poll.title
+        },
+        { hid: 'og:title', name: 'og:title', content: this.poll.title }
+      ]
+    }
+  },
   async asyncData({ app, params, redirect }) {
     const pollId = params.id
     try {
