@@ -26,6 +26,11 @@ export default {
   components: {
     VuetifyLogo
   },
+  head() {
+    return {
+      title: 'Home'
+    }
+  },
   data() {
     return {}
   }
