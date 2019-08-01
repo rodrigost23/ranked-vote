@@ -1,11 +1,24 @@
 <template>
   <v-app>
-    <v-app-bar app dark color="blue" elevate-on-scroll>
-      <nuxt-link to="/" class="toolbar-title">
-        <v-toolbar-title class="headline text-uppercase">
-          {{ $store.state.pageTitle }}
-        </v-toolbar-title>
-      </nuxt-link>
+    <v-app-bar
+      app
+      :dark="!isHome"
+      :color="isHome ? 'transparent' : 'primary'"
+      elevate-on-scroll
+    >
+      <v-tooltip bottom>
+        <template v-slot:activator="{ on }">
+          <v-fade-transition>
+            <v-btn v-if="!isHome" to="/" nuxt icon v-on="on">
+              <v-icon>mdi-arrow-left</v-icon>
+            </v-btn>
+          </v-fade-transition>
+        </template>
+        <span>Go to homepage</span>
+      </v-tooltip>
+      <v-toolbar-title v-if="!isHome">
+        {{ $store.state.pageTitle }}
+      </v-toolbar-title>
       <v-spacer />
       <v-tooltip bottom>
         <template v-slot:activator="{ on }">
@@ -31,6 +44,11 @@
 export default {
   data() {
     return {}
+  },
+  computed: {
+    isHome() {
+      return this.$route.path === '/'
+    }
   }
 }
 </script>
