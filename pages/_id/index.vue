@@ -9,16 +9,16 @@ export default {
   components: { poll },
   head() {
     return {
-      title: this.poll.title,
+      title: this.pollData.title,
       meta: [
-        { hid: 'name', itemprop: 'name', content: this.poll.title },
+        { hid: 'name', itemprop: 'name', content: this.pollData.title },
         { hid: 'twitter:card', name: 'twitter:card', content: 'app' },
         {
           hid: 'twitter:title',
           name: 'twitter:title',
-          content: this.poll.title
+          content: this.pollData.title
         },
-        { hid: 'og:title', name: 'og:title', content: this.poll.title }
+        { hid: 'og:title', name: 'og:title', content: this.pollData.title }
       ]
     }
   },
