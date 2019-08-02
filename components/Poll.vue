@@ -30,30 +30,54 @@
             </h3>
             <h3 v-else>{{ poll.title || 'No title' }}</h3>
             <v-spacer />
-            <v-btn
-              v-if="isView"
-              outlined
-              rounded
-              :color="$vuetify.theme.currentTheme.accent"
-              :loading="isSaving"
-              :disabled="isSaving || voteSaved || !isVoteComplete"
-              @click="saveVote()"
-            >
-              {{ voteSaved ? 'Saved' : 'Save' }}
-            </v-btn>
-            <span v-else style="height: 40px">
-              <v-fade-transition>
-                <share-button v-if="id && !isSaving" :value="shareUrl" />
-                <span v-else-if="id" class="caption grey--text">
-                  Saving&hellip;&nbsp;
-                  <v-progress-circular
-                    indeterminate
-                    :color="$vuetify.theme.currentTheme.primary"
-                    size="28"
-                  />
-                </span>
-              </v-fade-transition>
-            </span>
+            <v-fade-transition leave-absolute>
+              <span
+                v-if="isSaving"
+                key="0"
+                class="caption grey--text"
+                style="height: 40px"
+              >
+                Saving&hellip;&nbsp;
+                <v-progress-circular
+                  indeterminate
+                  :color="$vuetify.theme.currentTheme.primary"
+                  size="28"
+                />
+              </span>
+              <span v-else key="1" style="height: 40px">
+                <v-tooltip bottom>
+                  <template v-slot:activator="{ on }">
+                    <v-fade-transition>
+                      <v-btn
+                        v-show="!isCreate"
+                        icon
+                        small
+                        :to="'/' + $route.params.id + '/result'"
+                        nuxt
+                        v-on="on"
+                      >
+                        <v-icon>mdi-poll</v-icon>
+                      </v-btn>
+                    </v-fade-transition>
+                  </template>
+                  <span>See results</span>
+                </v-tooltip>
+                <v-fade-transition>
+                  <share-button v-show="isEdit" :value="shareUrl" />
+                </v-fade-transition>
+                <v-btn
+                  v-if="isView"
+                  outlined
+                  rounded
+                  :color="$vuetify.theme.currentTheme.accent"
+                  :loading="isSaving"
+                  :disabled="isSaving || voteSaved || !isVoteComplete"
+                  @click="saveVote()"
+                >
+                  {{ voteSaved ? 'Saved' : 'Save' }}
+                </v-btn>
+              </span>
+            </v-fade-transition>
           </v-card-title>
           <v-list flat>
             <v-layout>

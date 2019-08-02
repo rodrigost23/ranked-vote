@@ -10,12 +10,12 @@
       <v-tooltip bottom>
         <template v-slot:activator="{ on }">
           <v-fade-transition>
-            <v-btn v-if="!isHome" to="/" nuxt icon v-on="on">
+            <v-btn v-if="!isHome" icon @click="$router.back()" v-on="on">
               <v-icon>mdi-arrow-left</v-icon>
             </v-btn>
           </v-fade-transition>
         </template>
-        <span>Go to homepage</span>
+        <span>Go back</span>
       </v-tooltip>
       <v-toolbar-title v-if="!isHome">
         {{ $store.state.pageTitle }}
