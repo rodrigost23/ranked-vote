@@ -22,12 +22,13 @@ export default {
    */
   manifest: {
     name: 'Ranked Vote',
-    mobileAppIOS: true
+    mobileAppIOS: true,
+    theme_color: colors.blue.accent3
   },
   /*
    ** Customize the progress-bar color
    */
-  loading: { color: colors.blue.accent3 },
+  loading: { color: colors.blue.accent4 },
   /*
    ** Global CSS
    */

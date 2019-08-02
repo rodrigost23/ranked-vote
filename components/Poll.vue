@@ -32,7 +32,7 @@
             <v-spacer />
             <v-fade-transition leave-absolute>
               <span
-                v-if="isSaving"
+                v-if="!isView && isSaving"
                 key="0"
                 class="caption grey--text"
                 style="height: 40px"

@@ -34,11 +34,17 @@
                                   <v-chip
                                     class="mx-1"
                                     :color="color(item.id)"
-                                    outlined
+                                    :outlined="!$vuetify.theme.dark"
                                   >
                                     <v-avatar
                                       left
-                                      :color="color(item.id)"
+                                      :color="
+                                        color(item.id) +
+                                          ($vuetify.theme.dark ||
+                                          (!isTied && i === 0)
+                                            ? ' darken-3'
+                                            : '')
+                                      "
                                       class="white--text"
                                     >
                                       {{ j + 1 }}
@@ -72,15 +78,24 @@
                             :class="{ 'grey--text': !candidate.name }"
                           >
                             <v-chip
-                              :color="color(candidate.id)"
-                              :outlined="isTied || i > 0"
+                              :color="
+                                color(candidate.id) +
+                                  ($vuetify.theme.dark && (!isTied && i === 0)
+                                    ? ' lighten-1'
+                                    : '')
+                              "
+                              :outlined="
+                                !$vuetify.theme.dark && (isTied || i > 0)
+                              "
                               :class="{ 'white--text': !isTied && i === 0 }"
                             >
                               <v-avatar
                                 left
                                 :color="
                                   color(candidate.id) +
-                                    (!isTied && i === 0 ? ' darken-3' : '')
+                                    ($vuetify.theme.dark || (!isTied && i === 0)
+                                      ? ' darken-3'
+                                      : '')
                                 "
                                 class="white--text"
                               >
@@ -91,8 +106,8 @@
                                 right
                                 :color="
                                   color(candidate.id) +
-                                    (!isTied && i === 0
-                                      ? ' darken-1'
+                                    ($vuetify.theme.dark || (!isTied && i === 0)
+                                      ? ' darken-2'
                                       : ' lighten-5')
                                 "
                               >
@@ -135,12 +150,16 @@
                               v-for="candidate in tiedCandidates"
                               :key="candidate.id"
                               :color="color(candidate.id)"
-                              outlined
+                              :outlined="!$vuetify.theme.dark"
                             >
                               {{ candidate.name || 'Nameless candidate' }}
                               <v-avatar
                                 right
-                                :color="color(candidate.id) + ' lighten-5'"
+                                :color="
+                                  color(candidate.id) + $vuetify.theme.dark
+                                    ? ' darken-2'
+                                    : ' lighten-5'
+                                "
                               >
                                 {{ tiebreakerScores[candidate.id] }}
                               </v-avatar>
