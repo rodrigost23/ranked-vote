@@ -51,6 +51,17 @@
 
 <script>
 export default {
+  head() {
+    return {
+      meta: [
+        {
+          hid: 'theme-color',
+          itemprop: 'theme-color',
+          content: this.$vuetify.theme.currentTheme.primary
+        }
+      ]
+    }
+  },
   data() {
     return {}
   },
