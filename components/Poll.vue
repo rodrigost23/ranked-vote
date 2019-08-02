@@ -4,7 +4,10 @@
       <v-expand-transition>
         <v-card :tile="$vuetify.breakpoint.xs" :loading="isLoading">
           <v-overlay :absolute="true" :value="false" opacity="0.1">
-            <v-progress-circular indeterminate color="primary" />
+            <v-progress-circular
+              indeterminate
+              :color="$vuetify.theme.currentTheme.primary"
+            />
           </v-overlay>
           <v-card-title primary-title :class="{ 'grey--text': !poll.title }">
             <h3 v-if="!isView">
@@ -31,7 +34,7 @@
               v-if="isView"
               outlined
               rounded
-              color="primary"
+              :color="$vuetify.theme.currentTheme.accent"
               :loading="isSaving"
               :disabled="isSaving || voteSaved || !isVoteComplete"
               @click="saveVote()"
@@ -40,10 +43,14 @@
             </v-btn>
             <span v-else style="height: 40px">
               <v-fade-transition>
-                <share-button v-if="!isSaving" :value="shareUrl" />
-                <span v-else class="caption grey--text">
+                <share-button v-if="id && !isSaving" :value="shareUrl" />
+                <span v-else-if="id" class="caption grey--text">
                   Saving&hellip;&nbsp;
-                  <v-progress-circular indeterminate color="grey" size="28" />
+                  <v-progress-circular
+                    indeterminate
+                    :color="$vuetify.theme.currentTheme.primary"
+                    size="28"
+                  />
                 </span>
               </v-fade-transition>
             </span>
@@ -72,13 +79,13 @@
                         v-show="item.show && !item.hide"
                         :key="item.id"
                         style="overflow:hidden"
-                        class="handle"
+                        :class="{ handle: !voteSaved }"
                       >
                         <v-list-item>
                           <v-list-item-icon>
                             <v-avatar
                               size="36"
-                              color="primary"
+                              :color="$vuetify.theme.currentTheme.primary"
                               class="white--text"
                             >
                               <transition name="short-fade" appear>
@@ -112,7 +119,7 @@
                               <span v-if="isView">{{ item.name || 'No name' }}</span>
                             </v-list-item-title>
                           </v-list-item-content>
-                          <v-list-item-icon>
+                          <v-list-item-icon v-if="!voteSaved">
                             <up-down
                               :up-disabled="i == 0"
                               :down-disabled="i == vote.length - 1"
@@ -261,11 +268,6 @@ export default {
     pollPassword: {
       type: String,
       default: null
-    }
-  },
-  head() {
-    return {
-      title: this.poll.title
     }
   },
   data() {

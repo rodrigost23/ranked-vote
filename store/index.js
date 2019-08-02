@@ -1,5 +1,5 @@
-export const state = {
-  pageTitle: 'Ranked Vote'
+export const state = function() {
+  return { pageTitle: 'Ranked Vote' }
 }
 
 export const mutations = {

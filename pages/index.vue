@@ -2,17 +2,24 @@
   <v-container>
     <v-layout text-center wrap>
       <v-flex xs12>
-        <vuetify-logo />
+        <v-img src="/icon.png" height="300px" contain />
       </v-flex>
 
-      <v-flex mb-4>
+      <v-flex>
         <h1 class="display-2 font-weight-bold mb-3">
           Ranked voting system
         </h1>
-        <p class="subheading font-weight-regular">
+        <p class="subheading font-weight-regular" mb-4>
           Create democratic polls for everyone
         </p>
-        <v-btn dark color="blue" to="/new" nuxt>
+        <v-btn
+          x-large
+          dark
+          rounded
+          :color="$vuetify.theme.currentTheme.accent"
+          to="/new"
+          nuxt
+        >
           New poll
         </v-btn>
       </v-flex>
@@ -21,11 +28,7 @@
 </template>
 
 <script>
-import VuetifyLogo from '~/components/VuetifyLogo.vue'
 export default {
-  components: {
-    VuetifyLogo
-  },
   head() {
     return {
       title: 'Home'

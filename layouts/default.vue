@@ -2,9 +2,10 @@
   <v-app>
     <v-app-bar
       app
-      :dark="!isHome"
-      :color="isHome ? 'transparent' : 'primary'"
-      elevate-on-scroll
+      dark
+      :color="isHome ? 'transparent' : $vuetify.theme.currentTheme.primary"
+      :elevate-on-scroll="!isHome"
+      :flat="isHome"
     >
       <v-tooltip bottom>
         <template v-slot:activator="{ on }">
@@ -20,6 +21,14 @@
         {{ $store.state.pageTitle }}
       </v-toolbar-title>
       <v-spacer />
+      <v-tooltip bottom>
+        <template v-slot:activator="{ on }">
+          <v-btn icon v-on="on" @click="toggleDark">
+            <v-icon>mdi-brightness-4</v-icon>
+          </v-btn>
+        </template>
+        <span>Toggle theme</span>
+      </v-tooltip>
       <v-tooltip bottom>
         <template v-slot:activator="{ on }">
           <v-btn icon v-on="on">
@@ -48,6 +57,30 @@ export default {
   computed: {
     isHome() {
       return this.$route.path === '/'
+    },
+    isDark() {
+      return this.$vuetify.theme.dark
+    }
+  },
+  created() {
+    this.$vuetify.theme.dark = !!localStorage.dark
+    this.$store.subscribe((mutation, state) => {
+      switch (mutation.type) {
+        case 'SET_THEME_DARK':
+        case 'SET_THEME_LIGHT':
+          this.$vuetify.theme.dark = state.dark
+      }
+    })
+  },
+  methods: {
+    toggleDark() {
+      if (this.isDark) {
+        localStorage.dark = false
+        this.$vuetify.theme.dark = false
+      } else {
+        localStorage.dark = true
+        this.$vuetify.theme.dark = true
+      }
     }
   }
 }
