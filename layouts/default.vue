@@ -2,7 +2,7 @@
   <v-app>
     <v-app-bar
       app
-      dark
+      :dark="!isHome"
       :color="isHome ? 'transparent' : $vuetify.theme.currentTheme.primary"
       :elevate-on-scroll="!isHome"
       :flat="isHome"
@@ -63,7 +63,7 @@ export default {
     }
   },
   created() {
-    this.$vuetify.theme.dark = !!localStorage.dark
+    this.$vuetify.theme.dark = localStorage.dark === 'true'
     this.$store.subscribe((mutation, state) => {
       switch (mutation.type) {
         case 'SET_THEME_DARK':
