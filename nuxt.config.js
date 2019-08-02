@@ -17,13 +17,17 @@ export default {
       }
     ]
   },
+  /*
+   ** PWA configurations
+   */
   manifest: {
-    name: 'Ranked Vote'
+    name: 'Ranked Vote',
+    mobileAppIOS: true
   },
   /*
    ** Customize the progress-bar color
    */
-  loading: { color: colors.blue.darken2 },
+  loading: { color: colors.blue.accent3 },
   /*
    ** Global CSS
    */
