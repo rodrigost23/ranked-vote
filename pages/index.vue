@@ -29,13 +29,13 @@
 
 <script>
 export default {
+  data() {
+    return {}
+  },
   head() {
     return {
       title: 'Home'
     }
-  },
-  data() {
-    return {}
   }
 }
 </script>

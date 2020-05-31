@@ -30,18 +30,18 @@ export default {
       default: null
     }
   },
-  head() {
-    const title = this.errorTitle
-    return {
-      title
-    }
-  },
   data() {
     return {
       pageNotFound: 'Page Not Found',
       otherError: 'An error occurred (' + this.error.statusCode + ')',
       errorTitle:
         this.error.statusCode === 404 ? this.pageNotFound : this.otherError
+    }
+  },
+  head() {
+    const title = this.errorTitle
+    return {
+      title
     }
   }
 }

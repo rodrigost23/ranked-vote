@@ -5,6 +5,9 @@ export default ({ store }) => {
     data() {
       return {}
     },
+    destroyed() {
+      store.commit('SET_PAGE_TITLE', 'Ranked Vote')
+    },
     head() {
       return {
         changed() {
@@ -13,9 +16,6 @@ export default ({ store }) => {
           }
         }
       }
-    },
-    destroyed() {
-      store.commit('SET_PAGE_TITLE', 'Ranked Vote')
     }
   })
 }

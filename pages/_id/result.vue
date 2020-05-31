@@ -181,19 +181,25 @@
 
 <script>
 export default {
-  head() {
-    return {
-      title: this.poll.title,
-      meta: [
-        { hid: 'name', itemprop: 'name', content: this.poll.title },
-        { hid: 'twitter:card', name: 'twitter:card', content: 'app' },
-        {
-          hid: 'twitter:title',
-          name: 'twitter:title',
-          content: this.poll.title
-        },
-        { hid: 'og:title', name: 'og:title', content: this.poll.title }
-      ]
+  async asyncData({ app, params, error }) {
+    const pollId = params.id
+    try {
+      const pollData = (await app.$fireStore
+        .collection('polls')
+        .doc(pollId)
+        .get()).data()
+
+      const votesData = (await app.$fireStore
+        .collection('polls/' + pollId + '/votes')
+        .get()).docs.map((v) => v.data())
+
+      return {
+        id: pollId,
+        poll: pollData,
+        votes: votesData
+      }
+    } catch (e) {
+      error({ statusCode: 404 })
     }
   },
   data() {
@@ -290,27 +296,6 @@ export default {
           (id) => scores[id] === scores[this.sortCandidates(scores)[0].id]
         )
         .map((id) => this.candidateFromId(id))
-    }
-  },
-  async asyncData({ app, params, error }) {
-    const pollId = params.id
-    try {
-      const pollData = (await app.$fireStore
-        .collection('polls')
-        .doc(pollId)
-        .get()).data()
-
-      const votesData = (await app.$fireStore
-        .collection('polls/' + pollId + '/votes')
-        .get()).docs.map((v) => v.data())
-
-      return {
-        id: pollId,
-        poll: pollData,
-        votes: votesData
-      }
-    } catch (e) {
-      error({ statusCode: 404 })
     }
   },
 
@@ -416,6 +401,21 @@ export default {
         }
       }
       return combs
+    }
+  },
+  head() {
+    return {
+      title: this.poll.title,
+      meta: [
+        { hid: 'name', itemprop: 'name', content: this.poll.title },
+        { hid: 'twitter:card', name: 'twitter:card', content: 'app' },
+        {
+          hid: 'twitter:title',
+          name: 'twitter:title',
+          content: this.poll.title
+        },
+        { hid: 'og:title', name: 'og:title', content: this.poll.title }
+      ]
     }
   }
 }

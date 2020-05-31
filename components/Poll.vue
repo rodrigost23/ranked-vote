@@ -278,7 +278,7 @@ export default {
     type: {
       default: 'view',
       validator(value) {
-        return ['view', 'create', 'edit'].indexOf(value) !== -1
+        return ['view', 'create', 'edit'].includes(value)
       }
     },
     pollId: { type: String, default: null },
@@ -390,7 +390,7 @@ export default {
 
       const id = ++this.itemsMax
       const inserted = this.poll.candidates.push({
-        id: id,
+        id,
         name: null,
         show: false,
         hide: false
