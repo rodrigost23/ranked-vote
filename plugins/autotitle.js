@@ -1,12 +1,21 @@
 import Vue from 'vue'
-Vue.mixin({
-  data() {
-    return {}
-  },
-  mounted() {
-    this.$store.commit('SET_PAGE_TITLE', this.$meta().inject().titleChunk)
-  },
-  destroyed() {
-    this.$store.commit('SET_PAGE_TITLE', 'Ranked Vote')
-  }
-})
+
+export default ({ store }) => {
+  Vue.mixin({
+    data() {
+      return {}
+    },
+    head() {
+      return {
+        changed() {
+          if (store) {
+            store.commit('SET_PAGE_TITLE', this.titleChunk)
+          }
+        }
+      }
+    },
+    destroyed() {
+      store.commit('SET_PAGE_TITLE', 'Ranked Vote')
+    }
+  })
+}
