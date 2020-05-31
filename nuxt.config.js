@@ -20,10 +20,12 @@ export default {
   /*
    ** PWA configurations
    */
-  manifest: {
-    name: 'Ranked Vote',
-    mobileAppIOS: true,
-    theme_color: colors.blue.accent3
+  pwa: {
+    manifest: {
+      name: 'Ranked Vote',
+      mobileAppIOS: true,
+      theme_color: colors.blue.accent3
+    }
   },
   /*
    ** Customize the progress-bar color
@@ -45,9 +47,8 @@ export default {
     '@nuxtjs/pwa',
     '@nuxtjs/eslint-module',
     [
-      'nuxt-fire',
+      '@nuxtjs/firebase',
       {
-        // Required:
         config: {
           development: {
             apiKey: process.env.FIREBASE_KEY,
@@ -68,15 +69,14 @@ export default {
             appId: '1:169315955849:web:f34f758bb22da748'
           }
         },
-        // The following options are optional:
-        useOnly: [
-          'auth',
-          'firestore'
+        services: {
+          auth: true,
+          firestore: true
           // 'functions',
           // 'storage',
           // 'realtimeDb',
           // 'messaging'
-        ],
+        },
         customEnv: false,
         functionsLocation: 'us-east1'
       }

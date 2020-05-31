@@ -13,12 +13,12 @@
     "generate": "nuxt generate"
   },
   "dependencies": {
-    "@nuxtjs/pwa": "^3.0.0-beta.16",
+    "@nuxtjs/firebase": "^4.2.2",
+    "@nuxtjs/pwa": "^3.0.0-beta.20",
     "fibers": "^4.0.1",
     "firebase": "^6.3.1",
     "hashids": "^1.2.2",
-    "nuxt": "^2.8.1",
-    "nuxt-fire": "^1.4.1",
+    "nuxt": "^2.12.2",
     "vuedraggable": "^2.23.0"
   },
   "devDependencies": {

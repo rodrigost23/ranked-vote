@@ -1,3 +1,3 @@
 import '@nuxt/vue-app';
-import 'nuxt-fire';
+import '@nuxtjs/firebase';
 import 'vuetify'
