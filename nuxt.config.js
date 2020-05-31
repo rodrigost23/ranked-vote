@@ -1,6 +1,6 @@
 import colors from 'vuetify/es5/util/colors'
-
-export default {
+/** @type {import("@nuxt/types").Configuration} */
+const config = {
   mode: 'spa',
   /*
    ** Headers of the page
@@ -122,3 +122,5 @@ export default {
     transpile: [/^vuetify/]
   }
 }
+
+export default config
