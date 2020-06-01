@@ -31,6 +31,10 @@ const config = {
    ** Customize the progress-bar color
    */
   loading: { color: colors.blue.accent4 },
+  loadingIndicator: {
+    name: '~/components/loading.html',
+    color: colors.blue.accent4
+  },
   /*
    ** Global CSS
    */

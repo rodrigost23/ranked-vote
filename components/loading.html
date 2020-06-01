@@ -1,0 +1,97 @@
+<style>
+  body,
+  html,
+  #<%=globals.id %> {
+    background: <%=options.background %>;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0;
+    padding: 0;
+  }
+
+
+  @-webkit-keyframes progress-circular-dash {
+    0% {
+      stroke-dasharray: 1, 200;
+      stroke-dashoffset: 0px
+    }
+
+    50% {
+      stroke-dasharray: 100, 200;
+      stroke-dashoffset: -15px
+    }
+
+    to {
+      stroke-dasharray: 100, 200;
+      stroke-dashoffset: -125px
+    }
+  }
+
+  @keyframes progress-circular-dash {
+    0% {
+      stroke-dasharray: 1, 200;
+      stroke-dashoffset: 0px
+    }
+
+    50% {
+      stroke-dasharray: 100, 200;
+      stroke-dashoffset: -15px
+    }
+
+    to {
+      stroke-dasharray: 100, 200;
+      stroke-dashoffset: -125px
+    }
+  }
+
+  @-webkit-keyframes progress-circular-rotate {
+    to {
+      transform: rotate(1turn)
+    }
+  }
+
+  @keyframes progress-circular-rotate {
+    to {
+      transform: rotate(1turn)
+    }
+  }
+
+  .circle-progress {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    height: 80px;
+    width: 80px;
+    margin-left: -40px;
+    margin-top: -40px;
+  }
+
+  .circle-progress circle {
+    -webkit-animation: progress-circular-dash 1.4s ease-in-out infinite;
+    animation: progress-circular-dash 1.4s ease-in-out infinite;
+    stroke: <%=options.color%>;
+    stroke-linecap: round;
+    stroke-dasharray: 80, 200;
+    stroke-dashoffset: 0px;
+    transition: all .6s ease-in-out;
+  }
+
+  .circle-progress svg {
+    -webkit-animation: progress-circular-rotate 1.4s linear infinite;
+    animation: progress-circular-rotate 1.4s linear infinite;
+    transform-origin: center center;
+    transition: all .2s ease-in-out;
+  }
+</style>
+
+<div class="circle-progress">
+  <svg xmlns="http://www.w3.org/2000/svg"
+    viewBox="21.951219512195124 21.951219512195124 43.90243902439025 43.90243902439025">
+    <circle fill="transparent" cx="43.90243902439025" cy="43.90243902439025"
+      r="20" stroke-width="3.9024390243902443" stroke-dasharray="125.664"
+      stroke-dashoffset="125.66370614359172px"></circle>
+  </svg>
+</div>
