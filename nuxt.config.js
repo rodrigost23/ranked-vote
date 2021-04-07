@@ -1,4 +1,6 @@
 import colors from 'vuetify/es5/util/colors'
+require('dotenv').config({ path: './.env' })
+require('dotenv').config({ path: './.env.local' })
 /** @type {import("@nuxt/types").Configuration} */
 const config = {
   mode: 'spa',
@@ -55,24 +57,13 @@ const config = {
   /** @type {import("@nuxtjs/firebase").FirebaseConfiguration} */
   firebase: {
     config: {
-      development: {
-        apiKey: process.env.FIREBASE_KEY,
-        authDomain: 'ranked-vote.firebaseapp.com',
-        databaseURL: 'https://ranked-vote.firebaseio.com',
-        projectId: 'ranked-vote',
-        storageBucket: 'ranked-vote.appspot.com',
-        messagingSenderId: '169315955849',
-        appId: '1:169315955849:web:f34f758bb22da748'
-      },
-      production: {
-        apiKey: process.env.FIREBASE_KEY,
-        authDomain: 'ranked-vote.firebaseapp.com',
-        databaseURL: 'https://ranked-vote.firebaseio.com',
-        projectId: 'ranked-vote',
-        storageBucket: 'ranked-vote.appspot.com',
-        messagingSenderId: '169315955849',
-        appId: '1:169315955849:web:f34f758bb22da748'
-      }
+      apiKey: process.env.FIREBASE_KEY,
+      authDomain: 'ranked-vote.firebaseapp.com',
+      databaseURL: 'https://ranked-vote.firebaseio.com',
+      projectId: 'ranked-vote',
+      storageBucket: 'ranked-vote.appspot.com',
+      messagingSenderId: '169315955849',
+      appId: '1:169315955849:web:f34f758bb22da748'
     },
     services: {
       auth: true,
